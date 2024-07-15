@@ -77,54 +77,13 @@ function start() {
     })
 }
 
-// function for response 'Update employee role'
-function updateEmployeeRole() {
-    const reqEmployees =
-        `SELECT employee.id, employee.first_name, employee.last_name, 
-        roles.title FROM employee LEFT JOIN roles ON employee.role_id = roles.id`;
-    const reqRoles = 'SELECT * FROM roles';
-    connection.query(reqEmployees, (err, resEmployees) => {
+// function to view all departments
+function viewDepartments() {
+    const query = "SELECT * FROM departments";
+    connection.query(query, (err, res) => {
         if (err) throw err;
-        connection.query(reqRoles, (err, resRoles) => {
-            if (err) throw err;
-            inquirer.prompt([
-                {
-                    type: 'list',
-                    name: 'employee',
-                    message: 'What employee\'s role do you want to update?',
-                    choices: resEmployees.map(
-                        (employee) => `${employee.first_name} ${employee.last_name}`
-                    )
-                },
-                {
-                    type: 'list',
-                    name: 'role',
-                    message: 'Which role do you want to assign the selected employee?',
-                    choices: resRoles.map((role) => role.title),
-                }
-            ]).then((response) => {
-                const employee = resEmployees.find(
-                    (employee) =>
-                        `${employee.first_name} ${employee.last_name}` ===
-                        answers.employee
-                );
-                const role = resRoles.find(
-                    (role) => role.title === response.role
-                );
-                const query =
-                    'UPDATE employee SET role_id = ? WHERE id = ?';
-                connection.query(
-                    query,
-                    [role.id, employee.id],
-                    (err, res) => {
-                        if (err) throw err;
-                        console.log(
-                            `Updated ${employee.first_name} ${employee.last_name}'s role to ${role.title}ß`
-                        );
-                        start();
-                    }
-                );
-            })
-        });
+        console.table(res);
+        // restart the application
+        start();
     });
 }
